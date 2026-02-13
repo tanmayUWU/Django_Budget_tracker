@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Dashboard</title>
+    <h2>Budget Dashboard</h2>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        .income {
+            color: green;
+        }
+
+        .expense {
+            color: red;
+        }
+
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- MAIN CONTENT -->
+    <div>
+        <!-- INCOMES -->
+        <div class="card">
+            <form method="post" action="{% url 'index' %}">
+
+                {% if not form_income.instance.id %}
+
+                {% csrf_token %}
+                {{ form_income }}
+                <button name="save_Income" value="{{ income.id }}">Save Income</button>
+                {% endif %}
+            
+
+            <h2>Incomes</h2>
+            <table>
+                <tr>
+                    <th>Bank</th>
+                    <th>Amount</th>
+                    <th>Recieve Date</th>
+                    <th>Actions</th>
+                </tr>
+                {% for income in incomes %}
+                <tr>
+                {% if form_income.instance.id == income.id %}
+                
+                <!-- <form method="post" action="{% url 'index' %}"> -->
+                {% csrf_token %}
+                {{ form_income }}
+                <button  name="save_Income" value="{{ income.id }}">Save Income</button>
+                <!-- </form> -->
+                {% else %}
+
+                    <td>{{ income.bank }}</td>
+                    
+                    <td class="income">+{{ income.amount }}</td>
+                    <td>{{ income.recieve_date }}</td>
+                    <td>
+                        <form method="post" action="">
+                            {% csrf_token %}
+                        <button formnovalidate name="delete_income" value="{{ income.id }}" > Delete</button>
+                        <button formnovalidate name="edit_income" value="{{ income.id }}" > Edit</button>
+                        </form>
+                    </td>
+                {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No income added yet.</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <!-- Add Income -->
+
+        </form>
+
+        <!-- EXPENSES -->
+        <div class="card">
+            <form method="post" action="{% url 'index' %}">
+
+            {% if not form.instance.id %}
+
+            {% csrf_token %}
+            {{ form }}
+            <button name="save" value="{{ expense.id }}">Save Expense</button>
+
+            {% endif %}
+            <h2>Expenses</h2>
+
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                    
+                   
+                    
+                </tr>
+                {% for expense in expenses %}
+                <tr>
+                    {% if  form.instance.id == expense.id %}
+
+                    <!-- <form method="post" action="{% url 'index' %}">  -->
+                    {% csrf_token %}
+                    {{ form }}
+                    <button  name="save" value="{{ expense.id }}">Save Expense</button>
+
+                    {% else %}
+
+                    <td>{{ expense.category_name }}</td>
+                    <td>{{ expense.expense_note }}</td>
+                    <td class="expense">-{{ expense.amount }}</td>
+                    <td>{{ expense.spend_date }}</td>
+                    <td>
+                        <form method="post" action="">
+                        {% csrf_token %}
+                        <button formnovalidate name="delete" value="{{ expense.id }}" > Delete</button>
+                        <button formnovalidate name="edit_expense" value="{{ expense.id }}" > Edit</button>
+                        </form>
+
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No expenses recorded.</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </form>
+        </div>
+
+
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+        <!-- BALANCE -->
+        <div class="card">
+            <h2>Current Balance</h2>
+            <div class="balance">
+                {{ curr_bal }}
+            </div>
+        </div>
+
+        <!-- CURRENT MONTH EXPENSE -->
+        <div class="card">
+            <h2>This Month's Expense</h2>
+            <p class="expense">{{ this_m_spending }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
